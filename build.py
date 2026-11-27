@@ -325,9 +325,10 @@ def main() -> int:
             "tags": [t.strip() for t in meta.get("tags", "").split(",") if t.strip()],
             "summary": meta.get("summary", ""),
             "thumb": f'assets/{slug}/{Path(cover).name}' if cover else None,
+            "mtime": md.stat().st_mtime,
         })
 
-    items.sort(key=lambda x: x["date"], reverse=True)
+    items.sort(key=lambda x: (x["date"], x["mtime"]), reverse=True)
     (DOCS / "index.html").write_text(index_page(items), encoding="utf-8")
     print(f"built {len(items)} note(s):")
     for it in items:

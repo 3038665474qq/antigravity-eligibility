@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐 · ZDR 的笔记</title>
+<meta name="description" content="订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐">
+<meta property="og:description" content="订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。">
+<style>
+:root{--ink:#2f343a;--soft:#59616a;--mute:#8b939c;--line:#e6ebf0;--accent:#0b3d6b;--bg:#f3f5f7;--card:#fff}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;line-height:1.9;letter-spacing:.012em;-webkit-font-smoothing:antialiased}
+main{flex:1 0 auto}
+a{color:#1f5c99;text-decoration:none}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+
+/* ---------- 首页 ---------- */
+.site{padding:74px 0 34px}
+.site h1{font-size:34px;margin:0 0 12px;letter-spacing:-.4px;color:#111}
+.site p{margin:0;color:var(--mute);font-size:15px}
+.site .count{display:inline-block;margin-top:14px;font-size:13px;color:var(--mute);
+  border:1px solid var(--line);border-radius:999px;padding:3px 12px;background:#fff}
+.list{list-style:none;margin:0 0 80px;padding:0}
+.list li{margin:0 0 14px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:26px 30px;transition:.18s;box-shadow:0 1px 2px rgba(16,32,48,.03)}
+.card:hover{border-color:#cfdae6;box-shadow:0 8px 28px rgba(16,32,48,.08);transform:translateY(-2px)}
+.card .meta{font-size:13px;color:var(--mute);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap}
+.card .meta .tag{color:var(--accent);background:#eef3f9;border-radius:999px;padding:1px 9px}
+.card h2{font-size:21px;line-height:1.55;margin:0 0 10px;color:#12171c;letter-spacing:-.2px}
+.card p{margin:0;color:var(--soft);font-size:15px;line-height:1.8}
+.card .more{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent);font-weight:600}
+.card .thumb{float:right;width:132px;height:84px;object-fit:cover;border-radius:8px;margin:2px 0 12px 22px;border:1px solid var(--line)}
+
+/* ---------- 笔记页 ---------- */
+.back{max-width:880px;margin:0 auto;padding:26px 24px 0;font-size:14px}
+.back a{color:var(--mute)}
+.back a:hover{color:var(--accent)}
+.sheet{max-width:880px;margin:14px auto 70px;background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(16,32,48,.05),0 18px 60px rgba(16,32,48,.06)}
+.hero{display:block;width:100%;height:auto;border-bottom:1px solid var(--line)}
+.note{padding:52px 68px 72px}
+.note h1{font-size:31px;line-height:1.45;margin:0 0 14px;letter-spacing:-.3px;color:#12171c}
+.note .meta{font-size:13.5px;color:var(--mute);margin:0 0 34px;padding-bottom:24px;
+  border-bottom:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap}
+.note .meta .tag{color:var(--accent);background:#eef3f9;border-radius:999px;padding:1px 10px}
+.note p{margin:20px 0}
+.note h2{font-size:22px;font-weight:700;margin:50px 0 18px;padding-left:14px;position:relative;line-height:1.5;color:#12171c}
+.note h2:before{content:"";position:absolute;left:0;top:.26em;bottom:.26em;width:4px;border-radius:2px;background:var(--accent)}
+.note h3{font-size:17.5px;font-weight:700;margin:32px 0 8px;color:var(--accent)}
+.note strong{color:#0f1419}
+.note code{font-family:"Cascadia Mono",Consolas,monospace;font-size:.86em;background:#f3f5f7;
+  color:#8a2b2b;padding:2px 6px;border-radius:4px;word-break:break-word}
+.note pre{background:#f8fafb;border:1px solid #edf1f4;border-radius:10px;padding:18px 20px;margin:22px 0;
+  overflow-x:auto;font-size:13px;line-height:1.7}
+.note pre code{background:none;color:#3a424b;padding:0;font-size:13px}
+.note blockquote{margin:24px 0;padding:16px 22px;background:#f6f8fa;border-left:3px solid #c9d6e4;
+  border-radius:0 8px 8px 0;color:#4c565f;font-size:16px}
+.note blockquote p{margin:6px 0}
+.note figure{margin:30px 0}
+.note figure img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid #e9eef2;background:#fff}
+.note figcaption{margin-top:10px;font-size:13px;color:var(--mute);text-align:center}
+.note .tablewrap{overflow-x:auto;margin:26px 0}
+.note table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.7}
+.note th{background:var(--accent);color:#fff;font-weight:600;text-align:left;padding:11px 13px;border:1px solid var(--accent)}
+.note td{padding:11px 13px;border:1px solid var(--line);vertical-align:top}
+.note tr:nth-child(even) td{background:#f7f9fb}
+.note ul,.note ol{margin:18px 0;padding-left:22px}
+.note li{margin:9px 0}
+.note .attach{margin-top:46px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--mute)}
+
+footer.site{border-top:1px solid var(--line);padding:26px 0 50px;font-size:13px;color:var(--mute);margin-top:auto}
+footer.site a{color:var(--mute);border-bottom:1px solid var(--line)}
+
+@media (max-width:820px){
+  body{font-size:16px}
+  .site{padding:44px 0 24px}
+  .site h1{font-size:27px}
+  .card{padding:20px 20px}
+  .card h2{font-size:18.5px}
+  .card .thumb{display:none}
+  .note{padding:30px 22px 50px}
+  .note h1{font-size:24px}
+  .note h2{font-size:19.5px;margin-top:38px}
+  .sheet{border-radius:0;box-shadow:none;margin:10px 0 40px}
+}
+</style></head>
+<body>
+<div class="back"><a href="../index.html">← ZDR 的笔记</a></div>
+<div class="sheet">
+  <img class="hero" src="../assets/gpt-purchase/cover.png" alt="封面">
+  <div class="note">
+    <h1>付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐</h1>
+    <div class="meta"><span>2026-11-27</span><span class="tag">支付</span><span class="tag">ChatGPT</span><span class="tag">代理</span><span class="tag">实测</span></div>
+    <p>付款页上那句 <code>Your card was declined</code>，我见过三种反应：换一张卡、打电话问银行、再换一张卡。</p><p>钱其实一直在。被拒的是&quot;这一笔看起来不像一个正常的当地用户&quot;——而这跟余额、跟卡能不能用，是两件事。</p><h2>一、它到底在核对什么</h2><p>支付网关不问你护照号，它算一个概率：这笔交易像不像这个国家的正常消费者。输入有三个：</p><ul><li><strong>出口 IP</strong>：属于哪个国家，ASN 是家宽（ISP）还是机房（hosting）</li><li><strong>浏览器</strong>：时区、语言、WebRTC 暴露的真实 IP、字体与显卡指纹、这个环境里的历史登录态</li><li><strong>卡</strong>：BIN 属于哪个国家、账单地址填的是哪、持卡人姓名与账号是否对得上</li></ul><p>三个都指向同一个国家，就是一笔普通的订阅。只要有一层和另外两层打架——机房 IP 配美国卡、美国 IP 配中国时区、美国 BIN 配一个中国住址——风控模型就会把它挑出来。</p><figure><img src="../assets/gpt-purchase/align.png" alt="三层对齐：出口 IP、浏览器指纹、卡的 BIN 与账单地址" loading="lazy"><figcaption>三层对齐：出口 IP、浏览器指纹、卡的 BIN 与账单地址</figcaption></figure><p>所以这套流程的本质不是&quot;破解&quot;，是<strong>别自相矛盾</strong>。矛盾是会被算出来的。</p><h2>二、第一层：IP</h2><p>机房 IP 和住宅 IP 在风控里不是一个价位的东西。云厂商的 ASN 天然带着&quot;这里是服务器&quot;的标签，同一个号段上跑着爬虫、注册机、别人被封的账号。所以哪怕国家填对了，hosting ASN 也会先被降权。</p><p>住宅代理的逻辑就是把出口放在别人家的宽带上，ASN 属于当地运营商。我用的是 ROLA-IP 这类动态住宅池，选目标国家的节点。</p><p>两个细节比&quot;买哪个套餐&quot;更影响成败：</p><p><strong>付款那几分钟必须是同一个 IP。</strong> 动态池会轮换，得挑支持粘性会话（sticky session）的用法，或者干脆按小时锁定一个出口。中途换 IP 等于自己举报自己。</p><p><strong>从注册到付款，全程同一条出口。</strong> 谷歌账号在这里注册、OpenAI 在这里登录、卡在这里绑定——三件事发生在三个 IP 上，就等于告诉对方&quot;这个人在移动&quot;。</p><h2>三、第二层：浏览器</h2><p>很多人以为指纹浏览器的用处是&quot;多开&quot;。在这个场景里，它的用处是<strong>把身份固定下来</strong>。</p><p>日常那个 Chrome 里有什么：你的真实时区、中文语言偏好、一堆登录态、WebRTC 会绕过代理直连暴露真实内网 IP、还有过去几年积累的历史。这些东西和刚买的美国 IP 摆在一起，矛盾得非常明显。</p><p><a href="https://www.adspower.com/">AdsPower</a> 这类工具做的事很朴素：一个&quot;环境&quot;一套独立的 cookie、UA、时区、语言、Canvas/WebGL 指纹，再把环境的代理指向上面那个 IP。打开这个环境，就是一个&quot;住在美国、用美国 IP 的浏览器&quot;。</p><figure><img src="../assets/gpt-purchase/money.png" alt="身份链与资金链是两条独立的线" loading="lazy"><figcaption>身份链与资金链是两条独立的线</figcaption></figure><p>规矩只有一条：<strong>一个环境 = 一个身份 = 一个 IP = 一张卡</strong>，不混用。别在这个环境里登自己的主账号——那等于把两个身份焊在一起，之后哪个出事都会牵连另一个。</p><p>环境建好先自检一遍：浏览器里查 IP 归属、查时区、查 WebRTC 有没有漏真实地址。这一步花两分钟，能省掉后面两小时的怀疑人生。</p><h2>四、第三层：卡</h2><p>U 卡是预付性质的虚拟卡，卡号是美国的 BIN，钱先充进去、再刷出来。我用的这家（<a href="https://wap.roogoo.shop/register?inviteCode=a595uq">roogoo 的邀请链接</a>，带邀请码：你开卡免费，我会有一点返佣，介意的话去掉 <code>inviteCode</code> 直接访问）开卡流程是注册、实名、开卡、入金。</p><p>卡这一层最容易错的地方，不是 BIN，是<strong>账单地址</strong>。BIN 是卡商给的，改不了；账单地址是自己填的，很多人顺手填了真实住址——美国卡配中国地址，这一条就够拒了。填卡商给的那个美国地址，和卡一致。</p><p>第二容易错的是钱怎么进去。流程是：在 <a href="https://www.okx.com/">OKX</a> 买 USDT，提到卡商给的收款地址，到账后在卡内换成美元余额。这一段和支付本身没有关系，是两条独立的链——但它是整条流程里唯一有对手方风险的一段，后面单独说。</p><p>费用要算清楚：开卡费、充值手续费、货币转换、汇率点差，叠起来通常在小几个百分点。二十美元的订阅，别只充二十。</p><h2>五、顺序比细节重要</h2><p>1. 买 IP：目标国家、住宅、能锁会话</p><p>2. 建环境：绑代理，自检 IP / 时区 / WebRTC</p><p>3. 注册与登录：Google 账号、OpenAI，全程不换环境</p><p>4. 开卡入金：注册、开卡、USDT 入金、记下账单地址</p><p>5. 付款：填卡号 + 卡商地址 + 姓名，等结果</p><p>失败时按这个顺序查，别按直觉查：</p><ul><li><strong>页面根本不让进 / 提示地区不支持</strong> → 第一层，IP 的 ASN 或国别不对</li><li><strong>能进、但付款页一提交就拒</strong> → 第二层或第三层，先看时区语言，再看账单地址</li><li><strong>卡在&quot;处理中&quot;很久，最后失败</strong> → 第三层，余额、3DS 验证、或者卡商风控</li><li><strong>付款成功但账号被限</strong> → 不在这三层里，是平台的事</li></ul><p>大部分人从&quot;换卡&quot;开始查，因为卡是最容易换的东西。但顺序错了，换十张卡也没用。</p><h2>六、代价</h2><p>这一节比前面五节都重要。</p><p><strong>违反平台条款。</strong> OpenAI 的服务地区限制写在条款里，用代理和异地卡订阅这件事本身就不合规。平台有权封号、有权不退款，而且它不需要给你理由。付了一年的钱，第 364 天被封，也是可能的。</p><p><strong>卡商是单点风险。</strong> 虚拟卡服务商的资金池、合规资质、跑路概率，没有一样是你控制的。别把长期余额放在里面，用多少充多少。</p><p><strong>入金的合规性是另一件事。</strong> 用加密货币给境外卡充值，在不同地区的法律定性不一样，税务和外汇也各有说法。这一段我不替你做判断。</p><p><strong>成本不低。</strong> 住宅 IP 按流量或时长计费、开卡费、充值费、汇差，加起来比订阅标价高一截。它解决的是&quot;能不能付出去&quot;，不是&quot;划不划算&quot;。</p><p><strong>还有一条更便宜的替代方案</strong>：找人代充。代价是把账号交出去，风险和上面完全不同——但对你可能更划算，这取决于你更怕封号还是更怕被盗。</p><h2>七、最后</h2><p>这套流程跑通之后，你会有一个很具体的感受：为了一个本该三分钟完成的付款，你花了两小时，学到了三层风控的样子。</p><p>值不值，取决于你要的是&quot;用上&quot;，还是&quot;用得久&quot;。前者一次对齐就够，后者需要一条稳定不换的链路——同一个 IP、同一个环境、同一张卡，长期不动。</p><p>最贵的从来不是订阅费，是中间那些看起来省事、其实让你不知道自己卡在哪一步的操作。</p>
+    <div class="attach">本文也发布在 <a href="https://github.com/3038665474qq/zdr-notes">GitHub</a>，源码与脚本同仓。</div>
+  </div>
+</div>
+<footer class="site"><div class="wrap">© 2026 ZDR 的笔记 · <a href="https://github.com/3038665474qq">GitHub</a></div></footer>
+</body></html>
