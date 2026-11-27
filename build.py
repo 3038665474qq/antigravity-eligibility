@@ -508,9 +508,11 @@ def main() -> int:
             "mtime": md.stat().st_mtime,
             "text": plain_text(lines),
             "minutes": reading_minutes(lines),
+            "order": int(meta.get("order", 0) or 0),
         })
 
-    items.sort(key=lambda x: (x["date"], x["mtime"]), reverse=True)
+    # 排序：order 大的在前（手动置顶/置底），同 order 按日期倒序，同日按修改时间
+    items.sort(key=lambda x: (x["order"], x["date"], x["mtime"]), reverse=True)
     (DOCS / "index.html").write_text(index_page(items), encoding="utf-8")
 
     # 搜索索引：正文全文，供首页过滤用

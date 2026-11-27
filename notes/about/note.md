@@ -2,6 +2,7 @@
 title: 关于这个笔记库
 date: 2026-11-27
 tags: 说明, 工程
+order: -1
 summary: 一篇笔记一个目录，Markdown 写完跑一行 build.py，GitHub Pages 直接发布。新增笔记不需要动索引，也不用装任何依赖。
 cover: 
 ---

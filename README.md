@@ -28,8 +28,11 @@ date: 2026-11-26
 tags: Antigravity, Gemini
 summary: 一句话摘要，会显示在首页卡片上
 cover: images/cover.png      # 可选
+order: 0                     # 可选：大的排前面，负数沉底；同值按日期倒序
 ---
 ```
+
+首页排序规则：`order` 降序 → `date` 降序 → 修改时间降序。所以默认最新在前，想置顶就填 `order: 10`，想让说明类沉底就填 `order: -1`。
 
 ## 新增一篇
 
