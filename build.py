@@ -436,7 +436,9 @@ def index_page(items: list[dict]) -> str:
 
 
 def feed(items: list[dict]) -> str:
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # updated 用最新一篇的日期，而不是当前时间：保证重复构建产物一致，
+    # 否则 CI 每次都会看到 feed.xml 有 diff，白跑一次 commit。
+    now = (items[0]["date"] if items else "2026-01-01") + "T00:00:00Z"
     entries = []
     for it in items[:20]:
         url = f"{SITE_URL}notes/{it['slug']}.html"
