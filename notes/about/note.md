@@ -25,6 +25,8 @@ git add -A && git commit -m "新增：my-note" && git push
 
 推送之后两条流水线各管一段：`build-notes` 重新编译 `docs/`，Pages 再把它发出去。所以如果直接在网页上上传一个 `note.md`，站点也会自己更新。
 
+本地想先看一眼，跑 `python build.py --serve`，它会起在 <http://127.0.0.1:8000>，改完再跑一次刷新即可。
+
 ## 一条原则
 
 内容归内容，样式归样式。笔记里只有 Markdown，没有一行 HTML；改版式只动 `build.py`，不会碰到任何一篇旧文。
