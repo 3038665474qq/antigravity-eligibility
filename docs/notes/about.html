@@ -98,7 +98,7 @@ footer.site a{color:var(--mute);border-bottom:1px solid var(--line)}
     <p>这里的笔记都长一个样：<code>notes/&lt;slug&gt;/note.md</code> 加一个 <code>images/</code> 目录，<code>build.py</code> 把 <code>notes/</code> 编译成 <code>docs/</code>，GitHub Pages 从 <code>docs/</code> 发布。</p><h2>为什么不用现成的静态博客</h2><p>试过 Hexo 和 Hugo，最后都停在一件事上：为了写一篇两千字的文章，得先理解一套主题系统、一堆插件和一个版本可能对不上的 Node 环境。而这里真正需要的功能只有三个——把 Markdown 变成 HTML、把图片搬对位置、按时间倒序列出来。</p><p><code>build.py</code> 就是这三件事，三百多行，只用标准库。改样式直接翻到文件里的 <code>CSS</code> 常量，不用找主题目录。</p><h2>新增一篇要做什么</h2><pre><code class="language-bash">mkdir notes/my-note
 # 写 note.md，图片丢进 notes/my-note/images/
 python build.py
-git add -A &amp;&amp; git commit -m &quot;新增：my-note&quot; &amp;&amp; git push</code></pre><p>推送之后两条流水线各管一段：<code>build-notes</code> 重新编译 <code>docs/</code>，Pages 再把它发出去。所以如果直接在网页上上传一个 <code>note.md</code>，站点也会自己更新。</p><h2>一条原则</h2><p>内容归内容，样式归样式。笔记里只有 Markdown，没有一行 HTML；改版式只动 <code>build.py</code>，不会碰到任何一篇旧文。</p>
+git add -A &amp;&amp; git commit -m &quot;新增：my-note&quot; &amp;&amp; git push</code></pre><p>推送之后两条流水线各管一段：<code>build-notes</code> 重新编译 <code>docs/</code>，Pages 再把它发出去。所以如果直接在网页上上传一个 <code>note.md</code>，站点也会自己更新。</p><p>本地想先看一眼，跑 <code>python build.py --serve</code>，它会起在 &lt;http://127.0.0.1:8000&gt;，改完再跑一次刷新即可。</p><h2>一条原则</h2><p>内容归内容，样式归样式。笔记里只有 Markdown，没有一行 HTML；改版式只动 <code>build.py</code>，不会碰到任何一篇旧文。</p>
     <div class="attach">本文也发布在 <a href="https://github.com/3038665474qq/zdr-notes">GitHub</a>，源码与脚本同仓。</div>
   </div>
 </div>
