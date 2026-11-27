@@ -1,5 +1,7 @@
 # Antigravity 说你不符合资格：挡住你的不是 IP，是账号的“国籍”
 
+> 网页版：[https://3038665474qq.github.io/antigravity-eligibility/](https://3038665474qq.github.io/antigravity-eligibility/)　｜　封面、图注、代码块都在网页里排好
+
 11 月 25 日下午，我把 Antigravity 装好，登录，屏幕上出现两行字：
 
 > Sorry, this account is ineligible to use Antigravity
