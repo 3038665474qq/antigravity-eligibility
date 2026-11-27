@@ -5,6 +5,9 @@
 - 站点：<https://3038665474qq.github.io/zdr-notes/>
 - 仓库：<https://github.com/3038665474qq/zdr-notes>
 
+> ⚠️ 仓库必须保持 **Public**。免费账号不支持私有仓库的 Pages，一旦改成 Private，站点会立刻变成
+> “There isn't a GitHub Pages site here.”（Pages 设置也会被一并清掉，改回 Public 后要重新启用）。
+
 ## 结构
 
 ```
