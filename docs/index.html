@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ZDR 的笔记</title>
 <meta name="description" content="AI 工具、Unity、以及那些「以为换个节点就能解决」的问题。">
+<meta name="theme-color" content="#f3f5f7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>📝</text></svg>">
+<link rel="alternate" type="application/atom+xml" title="ZDR 的笔记" href="feed.xml">
 <style>
 :root{--ink:#2f343a;--soft:#59616a;--mute:#8b939c;--line:#e6ebf0;--accent:#0b3d6b;--bg:#f3f5f7;--card:#fff}
 *{box-sizing:border-box}
@@ -31,6 +34,27 @@ a{color:#1f5c99;text-decoration:none}
 .card p{margin:0;color:var(--soft);font-size:15px;line-height:1.8}
 .card .more{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent);font-weight:600}
 .card .thumb{float:right;width:132px;height:84px;object-fit:cover;border-radius:8px;margin:2px 0 12px 22px;border:1px solid var(--line)}
+.card .meta .rt{color:#a6adb5}
+
+/* ---------- 搜索 / 筛选 ---------- */
+.tools{margin:26px 0 18px}
+.search{position:relative;display:flex;align-items:center;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:0 14px;box-shadow:0 1px 2px rgba(16,32,48,.03);transition:.16s}
+.search:focus-within{border-color:#b9cadd;box-shadow:0 4px 18px rgba(16,32,48,.08)}
+.search svg{width:18px;height:18px;flex:0 0 auto;stroke:#9aa3ad;fill:none;stroke-width:2;
+  stroke-linecap:round;margin-right:10px}
+.search input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:15px;
+  padding:13px 0;color:var(--ink);-webkit-appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search kbd{font:12px/1 "Cascadia Mono",Consolas,monospace;color:#a6adb5;border:1px solid var(--line);
+  border-radius:5px;padding:3px 6px;background:#fafbfc}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font:inherit;font-size:13.5px;color:#5d6670;background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:5px 13px;cursor:pointer;transition:.14s}
+.chip:hover{border-color:#c6d4e2;color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+mark{background:#fff2b8;color:inherit;border-radius:2px;padding:0 1px}
+.empty{color:var(--mute);text-align:center;padding:40px 0 60px;font-size:15px}
 
 /* ---------- 笔记页 ---------- */
 .back{max-width:880px;margin:0 auto;padding:26px 24px 0;font-size:14px}
@@ -89,28 +113,127 @@ footer.site a{color:var(--mute);border-bottom:1px solid var(--line)}
 <header class="site"><div class="wrap">
   <h1>ZDR 的笔记</h1>
   <p>AI 工具、Unity、以及那些「以为换个节点就能解决」的问题。</p>
-  <span class="count">3 篇笔记</span>
+  <div class="tools">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg>
+      <input id="q" type="search" placeholder="搜索标题、正文、标签　按 / 聚焦" autocomplete="off" spellcheck="false" aria-label="搜索笔记">
+      <kbd>/</kbd>
+    </div>
+    <div class="chips"><button class="chip on" data-tag="all">全部</button><button class="chip" data-tag="支付">支付</button><button class="chip" data-tag="ChatGPT">ChatGPT</button><button class="chip" data-tag="代理">代理</button><button class="chip" data-tag="实测">实测</button><button class="chip" data-tag="说明">说明</button><button class="chip" data-tag="工程">工程</button><button class="chip" data-tag="Antigravity">Antigravity</button><button class="chip" data-tag="Gemini">Gemini</button><button class="chip" data-tag="网络排查">网络排查</button></div>
+  </div>
+  <span class="count"><span id="n">3</span> 篇笔记<span id="filtered"></span></span>
 </div></header>
 <main class="wrap">
-  <ol class="list"><li><a class="card" href="notes/gpt-purchase.html">
-  <img class="thumb" src="assets/gpt-purchase/cover.png" alt="">
-  <div class="meta"><span>2026-11-27</span><span class="tag">支付</span><span class="tag">ChatGPT</span><span class="tag">代理</span><span class="tag">实测</span></div>
+  <ol class="list"><li><a class="card" href="notes/gpt-purchase.html"
+   data-title="付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐"
+   data-summary="订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。"
+   data-tags="支付,ChatGPT,代理,实测"
+   data-hay="付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐 订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。 支付 ChatGPT 代理 实测">
+  <img class="thumb" src="assets/gpt-purchase/cover.png" alt="" loading="lazy">
+  <div class="meta"><span>2026-11-27</span><span class="rt">6 分钟</span><span class="tag">支付</span><span class="tag">ChatGPT</span><span class="tag">代理</span><span class="tag">实测</span></div>
   <h2>付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐</h2>
   <p>订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。</p>
   <span class="more">阅读 →</span>
-</a></li><li><a class="card" href="notes/about.html">
+</a></li><li><a class="card" href="notes/about.html"
+   data-title="关于这个笔记库"
+   data-summary="一篇笔记一个目录，Markdown 写完跑一行 build.py，GitHub Pages 直接发布。新增笔记不需要动索引，也不用装任何依赖。"
+   data-tags="说明,工程"
+   data-hay="关于这个笔记库 一篇笔记一个目录，Markdown 写完跑一行 build.py，GitHub Pages 直接发布。新增笔记不需要动索引，也不用装任何依赖。 说明 工程">
   
-  <div class="meta"><span>2026-11-27</span><span class="tag">说明</span><span class="tag">工程</span></div>
+  <div class="meta"><span>2026-11-27</span><span class="rt">1 分钟</span><span class="tag">说明</span><span class="tag">工程</span></div>
   <h2>关于这个笔记库</h2>
   <p>一篇笔记一个目录，Markdown 写完跑一行 build.py，GitHub Pages 直接发布。新增笔记不需要动索引，也不用装任何依赖。</p>
   <span class="more">阅读 →</span>
-</a></li><li><a class="card" href="notes/antigravity-eligibility.html">
-  <img class="thumb" src="assets/antigravity-eligibility/cover-ag-wide.png" alt="">
-  <div class="meta"><span>2026-11-26</span><span class="tag">Antigravity</span><span class="tag">Gemini</span><span class="tag">网络排查</span></div>
+</a></li><li><a class="card" href="notes/antigravity-eligibility.html"
+   data-title="Antigravity 说你不符合资格：挡住你的不是 IP，是账号的“国籍”"
+   data-summary="报错说「不符合资格」，第一反应都是换节点。其实它看的是你 Google 账号在服务条款页上挂的那个国家——三道门，各修各的。"
+   data-tags="Antigravity,Gemini,网络排查"
+   data-hay="Antigravity 说你不符合资格：挡住你的不是 IP，是账号的“国籍” 报错说「不符合资格」，第一反应都是换节点。其实它看的是你 Google 账号在服务条款页上挂的那个国家——三道门，各修各的。 Antigravity Gemini 网络排查">
+  <img class="thumb" src="assets/antigravity-eligibility/cover-ag-wide.png" alt="" loading="lazy">
+  <div class="meta"><span>2026-11-26</span><span class="rt">13 分钟</span><span class="tag">Antigravity</span><span class="tag">Gemini</span><span class="tag">网络排查</span></div>
   <h2>Antigravity 说你不符合资格：挡住你的不是 IP，是账号的“国籍”</h2>
   <p>报错说「不符合资格」，第一反应都是换节点。其实它看的是你 Google 账号在服务条款页上挂的那个国家——三道门，各修各的。</p>
   <span class="more">阅读 →</span>
 </a></li></ol>
+  <p class="empty" id="empty" hidden>没有匹配的笔记。换个词，或者按 Esc 清空。</p>
 </main>
-<footer class="site"><div class="wrap">© 2026 ZDR 的笔记 · <a href="https://github.com/3038665474qq">GitHub</a></div></footer>
+<footer class="site"><div class="wrap">© 2026 ZDR 的笔记 · <a href="https://github.com/3038665474qq">GitHub</a> · <a href="feed.xml">RSS</a></div></footer>
+<script>
+(function () {
+  var q = document.getElementById('q');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var lis = cards.map(function (c) { return c.parentElement; });
+  var empty = document.getElementById('empty');
+  var filtered = document.getElementById('filtered');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var state = { kw: '', tag: 'all' };
+  var loaded = false;
+
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function mark(text, kw) {
+    if (!kw) return esc(text);
+    var i = text.toLowerCase().indexOf(kw);
+    if (i < 0) return esc(text);
+    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + kw.length)) + '</mark>'
+      + esc(text.slice(i + kw.length));
+  }
+
+  function apply() {
+    var kw = state.kw.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c, i) {
+      var okTag = state.tag === 'all' || (c.dataset.tags || '').split(',').indexOf(state.tag) >= 0;
+      var okKw = !kw || (c.dataset.hay || '').toLowerCase().indexOf(kw) >= 0;
+      var vis = okTag && okKw;
+      lis[i].hidden = !vis;
+      if (vis) shown++;
+      var h = c.querySelector('h2'), p = c.querySelector('p');
+      if (kw && vis) {
+        h.innerHTML = mark(c.dataset.title, kw);
+        p.innerHTML = mark(c.dataset.summary, kw);
+      } else {
+        h.textContent = c.dataset.title;
+        p.textContent = c.dataset.summary;
+      }
+    });
+    empty.hidden = shown > 0;
+    filtered.textContent = (kw || state.tag !== 'all') ? ' · 匹配 ' + shown : '';
+  }
+
+  // 首次输入时把正文全文并进 haystack，失败就退化成标题+摘要搜索
+  function loadText() {
+    if (loaded) return;
+    loaded = true;
+    if (!window.fetch) return;
+    fetch('search.json').then(function (r) { return r.json(); }).then(function (rows) {
+      var bySlug = {};
+      rows.forEach(function (r) { bySlug[r.slug] = r.text || ''; });
+      cards.forEach(function (c) {
+        var slug = (c.getAttribute('href') || '').replace('notes/', '').replace('.html', '');
+        if (bySlug[slug]) c.dataset.hay += ' ' + bySlug[slug];
+      });
+      if (state.kw) apply();
+    }).catch(function () {});
+  }
+
+  q.addEventListener('input', function () { loadText(); state.kw = q.value; apply(); });
+  q.addEventListener('focus', loadText);
+  chips.forEach(function (b) {
+    b.addEventListener('click', function () {
+      chips.forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      state.tag = b.dataset.tag;
+      apply();
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape' && document.activeElement === q) {
+      q.value = ''; state.kw = ''; apply(); q.blur();
+    }
+  });
+})();
+</script>
 </body></html>

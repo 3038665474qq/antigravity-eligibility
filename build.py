@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import re
 import shutil
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -24,6 +25,9 @@ NOTES = ROOT / "notes"
 DOCS = ROOT / "docs"
 SITE_TITLE = "ZDR 的笔记"
 SITE_DESC = "AI 工具、Unity、以及那些「以为换个节点就能解决」的问题。"
+SITE_URL = "https://3038665474qq.github.io/zdr-notes/"
+ICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'>"
+        "<text y='13' font-size='13'>📝</text></svg>")
 
 INLINE = re.compile(r"(\*\*.+?\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))")
 
@@ -121,6 +125,26 @@ def parse_body(lines: list[str], slug: str) -> list[str]:
     return body
 
 
+def plain_text(lines: list[str]) -> str:
+    """把正文压成一串纯文本，给搜索用。"""
+    out = []
+    for raw in lines:
+        s = raw.strip()
+        if not s or s.startswith("```") or re.match(r"^!\[.*\]\(.*\)$", s):
+            continue
+        s = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", s)
+        s = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", s)
+        s = re.sub(r"^[#>\-\*\s]+", "", s)
+        s = s.replace("**", "").replace("`", "").replace("|", " ")
+        out.append(s)
+    return re.sub(r"\s+", " ", " ".join(out)).strip()
+
+
+def reading_minutes(lines: list[str]) -> int:
+    n = len(re.sub(r"\s", "", plain_text(lines)))
+    return max(1, round(n / 400))
+
+
 def parse_front_matter(text: str) -> tuple[dict, list[str]]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -164,6 +188,27 @@ a{color:#1f5c99;text-decoration:none}
 .card p{margin:0;color:var(--soft);font-size:15px;line-height:1.8}
 .card .more{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent);font-weight:600}
 .card .thumb{float:right;width:132px;height:84px;object-fit:cover;border-radius:8px;margin:2px 0 12px 22px;border:1px solid var(--line)}
+.card .meta .rt{color:#a6adb5}
+
+/* ---------- 搜索 / 筛选 ---------- */
+.tools{margin:26px 0 18px}
+.search{position:relative;display:flex;align-items:center;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:0 14px;box-shadow:0 1px 2px rgba(16,32,48,.03);transition:.16s}
+.search:focus-within{border-color:#b9cadd;box-shadow:0 4px 18px rgba(16,32,48,.08)}
+.search svg{width:18px;height:18px;flex:0 0 auto;stroke:#9aa3ad;fill:none;stroke-width:2;
+  stroke-linecap:round;margin-right:10px}
+.search input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:15px;
+  padding:13px 0;color:var(--ink);-webkit-appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search kbd{font:12px/1 "Cascadia Mono",Consolas,monospace;color:#a6adb5;border:1px solid var(--line);
+  border-radius:5px;padding:3px 6px;background:#fafbfc}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font:inherit;font-size:13.5px;color:#5d6670;background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:5px 13px;cursor:pointer;transition:.14s}
+.chip:hover{border-color:#c6d4e2;color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+mark{background:#fff2b8;color:inherit;border-radius:2px;padding:0 1px}
+.empty{color:var(--mute);text-align:center;padding:40px 0 60px;font-size:15px}
 
 /* ---------- 笔记页 ---------- */
 .back{max-width:880px;margin:0 auto;padding:26px 24px 0;font-size:14px}
@@ -235,6 +280,9 @@ def note_page(meta: dict, body: list[str], slug: str, cover: str | None) -> str:
 <meta property="og:type" content="article">
 <meta property="og:title" content="{html.escape(title)}">
 <meta property="og:description" content="{html.escape(meta.get('summary',''))}">
+<meta name="theme-color" content="#f3f5f7">
+<link rel="icon" href="{ICON}">
+<link rel="alternate" type="application/atom+xml" title="{SITE_TITLE}" href="../feed.xml">
 <style>{CSS}</style></head>
 <body>
 <div class="back"><a href="../index.html">← {SITE_TITLE}</a></div>
@@ -253,33 +301,165 @@ def note_page(meta: dict, body: list[str], slug: str, cover: str | None) -> str:
 
 def index_page(items: list[dict]) -> str:
     cards = []
+    all_tags = []
+    for it in items:
+        for t in it["tags"]:
+            if t not in all_tags:
+                all_tags.append(t)
     for it in items:
         tags = "".join(f'<span class="tag">{html.escape(t)}</span>' for t in it["tags"])
-        thumb = f'<img class="thumb" src="{it["thumb"]}" alt="">' if it["thumb"] else ""
-        cards.append(f"""<li><a class="card" href="notes/{it['slug']}.html">
+        thumb = f'<img class="thumb" src="{it["thumb"]}" alt="" loading="lazy">' if it["thumb"] else ""
+        cards.append(
+            f"""<li><a class="card" href="notes/{it['slug']}.html"
+   data-title="{html.escape(it['title'])}"
+   data-summary="{html.escape(it['summary'])}"
+   data-tags="{html.escape(','.join(it['tags']))}"
+   data-hay="{html.escape(' '.join([it['title'], it['summary'], ' '.join(it['tags'])]))}">
   {thumb}
-  <div class="meta"><span>{html.escape(it['date'])}</span>{tags}</div>
+  <div class="meta"><span>{html.escape(it['date'])}</span><span class="rt">{it['minutes']} 分钟</span>{tags}</div>
   <h2>{html.escape(it['title'])}</h2>
   <p>{html.escape(it['summary'])}</p>
   <span class="more">阅读 →</span>
-</a></li>""")
+</a></li>"""
+        )
+
+    chips = ['<button class="chip on" data-tag="all">全部</button>']
+    chips += [f'<button class="chip" data-tag="{html.escape(t)}">{html.escape(t)}</button>' for t in all_tags]
+
     return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{SITE_TITLE}</title>
 <meta name="description" content="{SITE_DESC}">
+<meta name="theme-color" content="#f3f5f7">
+<link rel="icon" href="{ICON}">
+<link rel="alternate" type="application/atom+xml" title="{SITE_TITLE}" href="feed.xml">
 <style>{CSS}</style></head>
 <body>
 <header class="site"><div class="wrap">
   <h1>{SITE_TITLE}</h1>
   <p>{SITE_DESC}</p>
-  <span class="count">{len(items)} 篇笔记</span>
+  <div class="tools">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg>
+      <input id="q" type="search" placeholder="搜索标题、正文、标签　按 / 聚焦" autocomplete="off" spellcheck="false" aria-label="搜索笔记">
+      <kbd>/</kbd>
+    </div>
+    <div class="chips">{''.join(chips)}</div>
+  </div>
+  <span class="count"><span id="n">{len(items)}</span> 篇笔记<span id="filtered"></span></span>
 </div></header>
 <main class="wrap">
   <ol class="list">{''.join(cards)}</ol>
+  <p class="empty" id="empty" hidden>没有匹配的笔记。换个词，或者按 Esc 清空。</p>
 </main>
-<footer class="site"><div class="wrap">© {date.today().year} {SITE_TITLE} · <a href="https://github.com/3038665474qq">GitHub</a></div></footer>
+<footer class="site"><div class="wrap">© {date.today().year} {SITE_TITLE} · <a href="https://github.com/3038665474qq">GitHub</a> · <a href="feed.xml">RSS</a></div></footer>
+<script>
+(function () {{
+  var q = document.getElementById('q');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var lis = cards.map(function (c) {{ return c.parentElement; }});
+  var empty = document.getElementById('empty');
+  var filtered = document.getElementById('filtered');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var state = {{ kw: '', tag: 'all' }};
+  var loaded = false;
+
+  function esc(s) {{
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }}
+  function mark(text, kw) {{
+    if (!kw) return esc(text);
+    var i = text.toLowerCase().indexOf(kw);
+    if (i < 0) return esc(text);
+    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + kw.length)) + '</mark>'
+      + esc(text.slice(i + kw.length));
+  }}
+
+  function apply() {{
+    var kw = state.kw.trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c, i) {{
+      var okTag = state.tag === 'all' || (c.dataset.tags || '').split(',').indexOf(state.tag) >= 0;
+      var okKw = !kw || (c.dataset.hay || '').toLowerCase().indexOf(kw) >= 0;
+      var vis = okTag && okKw;
+      lis[i].hidden = !vis;
+      if (vis) shown++;
+      var h = c.querySelector('h2'), p = c.querySelector('p');
+      if (kw && vis) {{
+        h.innerHTML = mark(c.dataset.title, kw);
+        p.innerHTML = mark(c.dataset.summary, kw);
+      }} else {{
+        h.textContent = c.dataset.title;
+        p.textContent = c.dataset.summary;
+      }}
+    }});
+    empty.hidden = shown > 0;
+    filtered.textContent = (kw || state.tag !== 'all') ? ' · 匹配 ' + shown : '';
+  }}
+
+  // 首次输入时把正文全文并进 haystack，失败就退化成标题+摘要搜索
+  function loadText() {{
+    if (loaded) return;
+    loaded = true;
+    if (!window.fetch) return;
+    fetch('search.json').then(function (r) {{ return r.json(); }}).then(function (rows) {{
+      var bySlug = {{}};
+      rows.forEach(function (r) {{ bySlug[r.slug] = r.text || ''; }});
+      cards.forEach(function (c) {{
+        var slug = (c.getAttribute('href') || '').replace('notes/', '').replace('.html', '');
+        if (bySlug[slug]) c.dataset.hay += ' ' + bySlug[slug];
+      }});
+      if (state.kw) apply();
+    }}).catch(function () {{}});
+  }}
+
+  q.addEventListener('input', function () {{ loadText(); state.kw = q.value; apply(); }});
+  q.addEventListener('focus', loadText);
+  chips.forEach(function (b) {{
+    b.addEventListener('click', function () {{
+      chips.forEach(function (x) {{ x.classList.remove('on'); }});
+      b.classList.add('on');
+      state.tag = b.dataset.tag;
+      apply();
+    }});
+  }});
+  document.addEventListener('keydown', function (e) {{
+    if (e.key === '/' && document.activeElement !== q) {{ e.preventDefault(); q.focus(); }}
+    if (e.key === 'Escape' && document.activeElement === q) {{
+      q.value = ''; state.kw = ''; apply(); q.blur();
+    }}
+  }});
+}})();
+</script>
 </body></html>"""
+
+
+def feed(items: list[dict]) -> str:
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    entries = []
+    for it in items[:20]:
+        url = f"{SITE_URL}notes/{it['slug']}.html"
+        d = it["date"] or "2026-01-01"
+        entries.append(f"""  <entry>
+    <title>{html.escape(it['title'])}</title>
+    <link href="{url}"/>
+    <id>{url}</id>
+    <updated>{d}T00:00:00Z</updated>
+    <summary>{html.escape(it['summary'])}</summary>
+  </entry>""")
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{SITE_TITLE}</title>
+  <subtitle>{SITE_DESC}</subtitle>
+  <link href="{SITE_URL}feed.xml" rel="self"/>
+  <link href="{SITE_URL}"/>
+  <id>{SITE_URL}</id>
+  <updated>{now}</updated>
+  <author><name>ZDR</name></author>
+{chr(10).join(entries)}
+</feed>
+"""
 
 
 def main() -> int:
@@ -326,10 +506,25 @@ def main() -> int:
             "summary": meta.get("summary", ""),
             "thumb": f'assets/{slug}/{Path(cover).name}' if cover else None,
             "mtime": md.stat().st_mtime,
+            "text": plain_text(lines),
+            "minutes": reading_minutes(lines),
         })
 
     items.sort(key=lambda x: (x["date"], x["mtime"]), reverse=True)
     (DOCS / "index.html").write_text(index_page(items), encoding="utf-8")
+
+    # 搜索索引：正文全文，供首页过滤用
+    (DOCS / "search.json").write_text(
+        json.dumps(
+            [{k: it[k] for k in ("slug", "title", "date", "tags", "summary", "text")} for it in items],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    # Atom feed
+    (DOCS / "feed.xml").write_text(feed(items), encoding="utf-8")
+
     print(f"built {len(items)} note(s):")
     for it in items:
         print(f"  {it['date']}  {it['title']}")

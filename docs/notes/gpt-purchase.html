@@ -6,6 +6,9 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="付款被拒，不是卡里没钱：订阅 ChatGPT 的三层对齐">
 <meta property="og:description" content="订阅页弹出 decline，多数人第一反应是换卡。真正被核对的是三样东西有没有指向同一个国家——出口 IP、浏览器指纹、卡的 BIN 与账单地址。">
+<meta name="theme-color" content="#f3f5f7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>📝</text></svg>">
+<link rel="alternate" type="application/atom+xml" title="ZDR 的笔记" href="../feed.xml">
 <style>
 :root{--ink:#2f343a;--soft:#59616a;--mute:#8b939c;--line:#e6ebf0;--accent:#0b3d6b;--bg:#f3f5f7;--card:#fff}
 *{box-sizing:border-box}
@@ -34,6 +37,27 @@ a{color:#1f5c99;text-decoration:none}
 .card p{margin:0;color:var(--soft);font-size:15px;line-height:1.8}
 .card .more{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent);font-weight:600}
 .card .thumb{float:right;width:132px;height:84px;object-fit:cover;border-radius:8px;margin:2px 0 12px 22px;border:1px solid var(--line)}
+.card .meta .rt{color:#a6adb5}
+
+/* ---------- 搜索 / 筛选 ---------- */
+.tools{margin:26px 0 18px}
+.search{position:relative;display:flex;align-items:center;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:0 14px;box-shadow:0 1px 2px rgba(16,32,48,.03);transition:.16s}
+.search:focus-within{border-color:#b9cadd;box-shadow:0 4px 18px rgba(16,32,48,.08)}
+.search svg{width:18px;height:18px;flex:0 0 auto;stroke:#9aa3ad;fill:none;stroke-width:2;
+  stroke-linecap:round;margin-right:10px}
+.search input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:15px;
+  padding:13px 0;color:var(--ink);-webkit-appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search kbd{font:12px/1 "Cascadia Mono",Consolas,monospace;color:#a6adb5;border:1px solid var(--line);
+  border-radius:5px;padding:3px 6px;background:#fafbfc}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font:inherit;font-size:13.5px;color:#5d6670;background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:5px 13px;cursor:pointer;transition:.14s}
+.chip:hover{border-color:#c6d4e2;color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+mark{background:#fff2b8;color:inherit;border-radius:2px;padding:0 1px}
+.empty{color:var(--mute);text-align:center;padding:40px 0 60px;font-size:15px}
 
 /* ---------- 笔记页 ---------- */
 .back{max-width:880px;margin:0 auto;padding:26px 24px 0;font-size:14px}
